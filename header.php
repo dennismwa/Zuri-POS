@@ -5,6 +5,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 $settings = getSettings();
 $page_title = $page_title ?? 'Dashboard';
+$currentPage = basename($_SERVER['PHP_SELF']);
+$isOwner = $_SESSION['role'] === 'owner';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -151,226 +153,218 @@ $page_title = $page_title ?? 'Dashboard';
     <!-- Sidebar -->
     <aside class="sidebar fixed left-0 top-0 h-screen w-64">
         <div class="flex flex-col h-full">
-            <!-- Logo Section -->
-            <div class="p-4 md:p-6 border-b border-gray-700">
+            <!-- Logo Section - SMALLER & MORE COMPACT -->
+            <div class="p-3 border-b border-gray-700">
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-                        <div class="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-wine-bottle text-white text-base md:text-xl"></i>
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-wine-bottle text-white text-base"></i>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <h2 class="font-bold text-sm md:text-lg text-white leading-tight truncate"><?php echo htmlspecialchars($settings['company_name']); ?></h2>
-                            <p class="text-xs text-gray-400 truncate"><?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
+                            <h2 class="font-bold text-sm text-white leading-tight truncate"><?php echo htmlspecialchars($settings['company_name']); ?></h2>
+                            <p class="text-xs text-gray-400 truncate"><?php echo htmlspecialchars($_SESSION['role']); ?></p>
                         </div>
                     </div>
                     <button id="closeSidebar" class="md:hidden text-gray-400 hover:text-white flex-shrink-0 ml-2">
-                        <i class="fas fa-times text-xl"></i>
+                        <i class="fas fa-times text-lg"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 overflow-y-auto p-3 md:p-4">
-                <ul class="space-y-0.5 md:space-y-1">
-                    <?php if ($_SESSION['role'] === 'owner'): ?>
+            <nav class="flex-1 overflow-y-auto p-3">
+                <ul class="space-y-0.5">
+                    <?php if ($isOwner): ?>
                     <li>
-                        <a href="/dashboard.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-chart-line w-4 md:w-5"></i>
+                        <a href="/dashboard.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-chart-line w-4"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <?php endif; ?>
                     
                     <li>
-                        <a href="/pos.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'pos.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-cash-register w-4 md:w-5"></i>
+                        <a href="/pos.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'pos.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-cash-register w-4"></i>
                             <span>Point of Sale</span>
                         </a>
                     </li>
                     
-                    <li class="pt-2 md:pt-4">
-                        <p class="px-3 md:px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 md:mb-2">Inventory</p>
+                    <!-- INVENTORY SECTION -->
+                    <li class="pt-3">
+                        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Inventory</p>
                     </li>
                     
                     <li>
-                        <a href="/products.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'products.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-wine-bottle w-4 md:w-5"></i>
+                        <a href="/products.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'products.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-wine-bottle w-4"></i>
                             <span>Products</span>
                         </a>
                     </li>
                     
                     <li>
-                        <a href="/categories.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'categories.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-tags w-4 md:w-5"></i>
+                        <a href="/categories.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'categories.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-tags w-4"></i>
                             <span>Categories</span>
                         </a>
                     </li>
                     
-                    
                     <li>
-                        <a href="/inventory.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'inventory.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-boxes w-4 md:w-5"></i>
+                        <a href="/inventory.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'inventory.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-boxes w-4"></i>
                             <span>Stock Management</span>
                         </a>
                     </li>
                     
-                    <?php if ($_SESSION['role'] === 'owner'): ?>
+                    <?php if ($isOwner): ?>
                     <li>
-                        <a href="/stock-movements.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'stock-movements.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-history w-4 md:w-5"></i>
+                        <a href="/stock-movements.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'stock-movements.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-history w-4"></i>
                             <span>Stock Audit Trail</span>
                         </a>
                     </li>
-                    <!-- ADD THIS TO THE NAVIGATION SECTION IN header.php -->
-<!-- After the "Inventory" section and before "Transactions" section -->
-
-<?php if ($_SESSION['role'] === 'owner'): ?>
-<li class="pt-4">
-    <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Multi-Store</p>
-</li>
-
-<li>
-    <a href="/branches.php" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 transition <?php echo basename($_SERVER['PHP_SELF']) === 'branches.php' ? 'active' : ''; ?>">
-        <i class="fas fa-store w-5"></i>
-        <span>Branch Management</span>
-    </a>
-</li>
-
-<li>
-    <a href="/branch-comparison.php" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 transition <?php echo basename($_SERVER['PHP_SELF']) === 'branch-comparison.php' ? 'active' : ''; ?>">
-        <i class="fas fa-chart-line w-5"></i>
-        <span>Branch Comparison</span>
-    </a>
-</li>
-
-<li>
-    <a href="/stock-transfers.php" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 transition <?php echo basename($_SERVER['PHP_SELF']) === 'stock-transfers.php' ? 'active' : ''; ?>">
-        <i class="fas fa-exchange-alt w-5"></i>
-        <span>Stock Transfers</span>
-    </a>
-</li>
-<?php endif; ?>
-                    <?php endif; ?>
                     
-                    <li class="pt-2 md:pt-4">
-                        <p class="px-3 md:px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 md:mb-2">Transactions</p>
+                    <!-- MULTI-STORE SECTION -->
+                    <li class="pt-3">
+                        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Multi-Store</p>
                     </li>
                     
                     <li>
-                        <a href="/sales.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'sales.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-receipt w-4 md:w-5"></i>
+                        <a href="/branches.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'branches.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-store w-4"></i>
+                            <span>Branch Management</span>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="/branch-comparison.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'branch-comparison.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-chart-line w-4"></i>
+                            <span>Branch Comparison</span>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="/stock-transfers.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'stock-transfers.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-exchange-alt w-4"></i>
+                            <span>Stock Transfers</span>
+                        </a>
+                    </li>
+                    <?php endif; ?>
+                    
+                    <!-- TRANSACTIONS SECTION -->
+                    <li class="pt-3">
+                        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Transactions</p>
+                    </li>
+                    
+                    <li>
+                        <a href="/sales.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'sales.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-receipt w-4"></i>
                             <span>Sales History</span>
                         </a>
                     </li>
-                    <!-- For ALL users (sellers and owners) -->
-<a href="/cash-register.php" 
-   class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo $page_title === 'Cash Register' ? 'active' : ''; ?>">
-    <i class="fas fa-cash-register w-4 md:w-5"></i>
-    <span>Cash Register</span>
-</a>
-
-<!-- For OWNERS only -->
-<?php if ($_SESSION['role'] === 'owner'): ?>
-<a href="/register-history.php" 
-   class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo $page_title === 'Register History' ? 'active' : ''; ?>">
-    <i class="fas fa-history w-4 md:w-5"></i>
-    <span>Register History</span>
-</a>
-<?php endif; ?>
                     
                     <li>
-                        <a href="/expenses.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'expenses.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-money-bill-wave w-4 md:w-5"></i>
+                        <a href="/cash-register.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'cash-register.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-cash-register w-4"></i>
+                            <span>Cash Register</span>
+                        </a>
+                    </li>
+                    
+                    <?php if ($isOwner): ?>
+                    <li>
+                        <a href="/register-history.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'register-history.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-history w-4"></i>
+                            <span>Register History</span>
+                        </a>
+                    </li>
+                    <?php endif; ?>
+                    
+                    <li>
+                        <a href="/expenses.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'expenses.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-money-bill-wave w-4"></i>
                             <span>Expenses</span>
                         </a>
                     </li>
-                    <?php if ($_SESSION['role'] === 'owner'): ?>
-                    <li class="pt-2 md:pt-4">
-                        <p class="px-3 md:px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 md:mb-2">Analytics</p>
+                    
+                    <?php if ($isOwner): ?>
+                    <!-- ANALYTICS SECTION -->
+                    <li class="pt-3">
+                        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Analytics</p>
                     </li>
                     
                     <li>
-                        <a href="/reports.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'reports.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-chart-bar w-4 md:w-5"></i>
+                        <a href="/reports.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'reports.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-chart-bar w-4"></i>
                             <span>Reports</span>
                         </a>
                     </li>
                     
-                    <li class="pt-2 md:pt-4">
-                        <p class="px-3 md:px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 md:mb-2">Settings</p>
+                    <li>
+                        <a href="/breakeven-analysis.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'breakeven-analysis.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-chart-line w-4"></i>
+                            <span>Break-Even Analysis</span>
+                        </a>
+                    </li>
+                    
+                    <!-- SETTINGS SECTION -->
+                    <li class="pt-3">
+                        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Settings</p>
                     </li>
                     
                     <li>
-                        <a href="/users.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'users.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-users w-4 md:w-5"></i>
+                        <a href="/users.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'users.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-users w-4"></i>
                             <span>Users</span>
                         </a>
                     </li>
-                    <?php if ($isOwner): ?>
-<!-- Existing owner menu items... -->
-
-<!-- ADD THIS NEW MENU ITEM -->
-<a href="/whatsapp-integration.php" 
-   class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all hover:bg-<?php echo $settings['primary_color']; ?>10 <?php echo $currentPage === 'whatsapp-integration.php' ? 'bg-'.$settings['primary_color'].'20 font-semibold' : ''; ?>">
-    <i class="fab fa-whatsapp text-xl <?php echo $currentPage === 'whatsapp-integration.php' ? 'text-green-600' : 'text-gray-600'; ?>"></i>
-    <span class="<?php echo $currentPage === 'whatsapp-integration.php' ? 'text-white-900' : 'text-white-700'; ?>">WhatsApp</span>
-</a>
-
-<?php endif; ?>
-<!-- ADD THESE MENU ITEMS TO YOUR EXISTING HEADER.PHP NAVIGATION -->
-
-<?php if ($_SESSION['role'] === 'owner'): ?>
-    <!-- Permissions Management -->
-    <a href="/permissions-management.php" 
-       class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg transition hover:bg-white/10 text-sm md:text-base <?php echo $page_title === 'Permissions Management' ? 'bg-white/20 text-white' : 'text-gray-300'; ?>">
-        <i class="fas fa-user-shield w-4 md:w-5"></i>
-        <span class="font-medium">Permissions</span>
-    </a>
-    
-    <!-- Audit Logs -->
-    <a href="/audit-logs.php" 
-       class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg transition hover:bg-white/10 text-sm md:text-base <?php echo $page_title === 'Audit Logs' ? 'bg-white/20 text-white' : 'text-gray-300'; ?>">
-        <i class="fas fa-clipboard-list w-4 md:w-5"></i>
-        <span class="font-medium">Audit Logs</span>
-    </a>
-    
-    <!-- Break-Even Analysis -->
-    <a href="/breakeven-analysis.php" 
-       class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg transition hover:bg-white/10 text-sm md:text-base <?php echo $page_title === 'Break-Even Analysis' ? 'bg-white/20 text-white' : 'text-gray-300'; ?>">
-        <i class="fas fa-chart-line w-4 md:w-5"></i>
-        <span class="font-medium">Break-Even</span>
-    </a>
-<?php elseif (hasPermission('can_view_audit_logs')): ?>
-    <!-- Audit Logs for non-owners with permission -->
-    <a href="/audit-logs.php" 
-       class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg transition hover:bg-white/10 text-sm md:text-base <?php echo $page_title === 'Audit Logs' ? 'bg-white/20 text-white' : 'text-gray-300'; ?>">
-        <i class="fas fa-clipboard-list w-4 md:w-5"></i>
-        <span class="font-medium">Audit Logs</span>
-    </a>
-<?php endif; ?>
+                    
                     <li>
-                        <a href="/settings.php" class="sidebar-link flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-gray-300 transition text-sm md:text-base <?php echo basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-cog w-4 md:w-5"></i>
+                        <a href="/permissions-management.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'permissions-management.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-user-shield w-4"></i>
+                            <span>Permissions</span>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="/audit-logs.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'audit-logs.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-clipboard-list w-4"></i>
+                            <span>Audit Logs</span>
+                        </a>
+                    </li>
+                    
+                    <!-- WHATSAPP MENU ITEM - NOW VISIBLE -->
+                    <li>
+                        <a href="/whatsapp-integration.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'whatsapp-integration.php' ? 'active' : ''; ?>">
+                            <i class="fab fa-whatsapp w-4"></i>
+                            <span>WhatsApp Integration</span>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="/settings.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'settings.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-cog w-4"></i>
                             <span>System Settings</span>
+                        </a>
+                    </li>
+                    <?php elseif (hasPermission('can_view_audit_logs')): ?>
+                    <!-- For non-owners with audit permission -->
+                    <li class="pt-3">
+                        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Admin</p>
+                    </li>
+                    <li>
+                        <a href="/audit-logs.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'audit-logs.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-clipboard-list w-4"></i>
+                            <span>Audit Logs</span>
                         </a>
                     </li>
                     <?php endif; ?>
                 </ul>
             </nav>
 
-            <!-- User Profile & Logout -->
-            <div class="p-3 md:p-4 border-t border-gray-700">
-                <div class="flex items-center gap-2 md:gap-3 mb-2 md:mb-3 p-2 md:p-3 bg-gray-800 rounded-lg">
-                    <div class="user-avatar w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base flex-shrink-0">
-                        <?php echo strtoupper(substr($_SESSION['user_name'], 0, 1)); ?>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs md:text-sm font-semibold text-white truncate"><?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
-                        <p class="text-xs text-gray-400 capitalize"><?php echo htmlspecialchars($_SESSION['role']); ?></p>
-                    </div>
-                </div>
-                <a href="/logout.php" class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-red-400 hover:bg-red-500 hover:bg-opacity-10 transition text-sm md:text-base">
-                    <i class="fas fa-sign-out-alt w-4 md:w-5"></i>
+            <!-- LOGOUT ONLY - User profile removed -->
+            <div class="p-3 border-t border-gray-700">
+                <a href="/logout.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500 hover:bg-opacity-10 transition text-sm">
+                    <i class="fas fa-sign-out-alt w-4"></i>
                     <span>Logout</span>
                 </a>
             </div>
@@ -379,25 +373,25 @@ $page_title = $page_title ?? 'Dashboard';
 
     <!-- Main Content Area -->
     <div class="md:ml-64 min-h-screen flex flex-col pb-20 md:pb-0">
-        <!-- Top Bar -->
+        <!-- Top Bar - SMALLER & MORE RESPONSIVE -->
         <header class="top-bar sticky top-0 z-20 no-print">
-            <div class="px-4 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <button id="menuBtn" class="md:hidden text-gray-600 hover:text-primary transition">
-                        <i class="fas fa-bars text-2xl"></i>
+            <div class="px-3 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <button id="menuBtn" class="md:hidden text-gray-600 hover:text-primary transition flex-shrink-0">
+                        <i class="fas fa-bars text-xl"></i>
                     </button>
-                    <div>
-                        <h1 class="text-xl font-bold text-gray-800"><?php echo htmlspecialchars($page_title); ?></h1>
-                        <p class="text-xs text-gray-500 hidden sm:block"><?php echo date('l, F d, Y'); ?></p>
+                    <div class="min-w-0">
+                        <h1 class="text-base md:text-lg font-bold text-gray-800 truncate"><?php echo htmlspecialchars($page_title); ?></h1>
+                        <p class="text-xs text-gray-500 hidden sm:block truncate"><?php echo date('M d, Y'); ?></p>
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 flex-shrink-0">
                     <!-- Quick Stats -->
-                    <?php if ($_SESSION['role'] === 'owner'): ?>
-                    <div class="hidden lg:flex items-center gap-2 stats-badge px-3 py-2 rounded-lg text-white text-xs font-semibold">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Today: <?php 
+                    <?php if ($isOwner): ?>
+                    <div class="hidden lg:flex items-center gap-1 stats-badge px-2 py-1 rounded-lg text-white text-xs font-semibold">
+                        <i class="fas fa-chart-line text-xs"></i>
+                        <span><?php 
                             $today_quick = $conn->query("SELECT COALESCE(SUM(total_amount), 0) as total FROM sales WHERE DATE(sale_date) = CURDATE()");
                             echo $today_quick ? formatCurrency($today_quick->fetch_assoc()['total']) : 'KSh 0.00';
                         ?></span>
@@ -405,20 +399,14 @@ $page_title = $page_title ?? 'Dashboard';
                     <?php endif; ?>
                     
                     <!-- Time -->
-                    <div class="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
-                        <i class="far fa-clock text-gray-600"></i>
-                        <span id="currentTime" class="text-sm font-medium text-gray-700"></span>
+                    <div class="hidden sm:flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg">
+                        <i class="far fa-clock text-gray-600 text-xs"></i>
+                        <span id="currentTime" class="text-xs font-medium text-gray-700"></span>
                     </div>
                     
-                    <!-- User Info -->
-                    <div class="flex items-center gap-2">
-                        <div class="user-avatar w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                            <?php echo strtoupper(substr($_SESSION['user_name'], 0, 1)); ?>
-                        </div>
-                        <div class="hidden sm:block">
-                            <p class="text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
-                            <p class="text-xs text-gray-500 capitalize"><?php echo htmlspecialchars($_SESSION['role']); ?></p>
-                        </div>
+                    <!-- User Avatar Only - No Name -->
+                    <div class="user-avatar w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold cursor-pointer" title="<?php echo htmlspecialchars($_SESSION['user_name']); ?>">
+                        <?php echo strtoupper(substr($_SESSION['user_name'], 0, 1)); ?>
                     </div>
                 </div>
             </div>
@@ -455,7 +443,6 @@ function updateTime() {
     const timeStr = now.toLocaleTimeString('en-US', { 
         hour: '2-digit', 
         minute: '2-digit',
-        second: '2-digit',
         hour12: true 
     });
     const timeEl = document.getElementById('currentTime');
