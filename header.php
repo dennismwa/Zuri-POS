@@ -358,6 +358,16 @@ $isOwner = $_SESSION['role'] === 'owner';
                         </a>
                     </li>
                     <?php endif; ?>
+                    <<li class="pt-3">
+                        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Help</p>
+                    </li>
+                    
+                    <li>
+                        <a href="/guide.php" class="sidebar-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 transition text-sm <?php echo $currentPage === 'guide.php' ? 'active' : ''; ?>">
+                            <i class="fas fa-book-open w-4"></i>
+                            <span>System Guide</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
 
