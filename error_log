@@ -1,0 +1,28 @@
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "company_name" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 63
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 63
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 86
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 94
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "logo_path" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 109
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 109
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "company_name" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 110
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 110
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "company_name" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 114
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 114
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 148
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 148
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 148
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 148
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 148
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 148
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 148
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 148
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 148
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 170
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 170
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 171
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "primary_color" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 171
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Warning:  Undefined array key "company_name" in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 185
+[07-Oct-2025 10:55:46 Africa/Nairobi] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/vxjtgclw/stockhub.zuri.co.ke/index.php on line 185
+[08-Oct-2025 11:23:57 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/vxjtgclw/stockhub.zuri.co.ke/config.php on line 6
+[08-Oct-2025 13:32:31 UTC] PHP Fatal error:  Cannot redeclare hasPermission() (previously declared in /home/vxjtgclw/stockhub.zuri.co.ke/config.php:457) in /home/vxjtgclw/stockhub.zuri.co.ke/config.php on line 683
+[08-Oct-2025 13:32:44 UTC] PHP Fatal error:  Cannot redeclare hasPermission() (previously declared in /home/vxjtgclw/stockhub.zuri.co.ke/config.php:457) in /home/vxjtgclw/stockhub.zuri.co.ke/config.php on line 683
