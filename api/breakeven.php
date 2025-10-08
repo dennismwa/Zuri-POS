@@ -1,6 +1,6 @@
 <?php
 /**
- * Break-Even Analysis API
+ * Break-Even Analysis API - FIXED AUDIT LOGGING
  * api/breakeven.php
  */
 
@@ -58,7 +58,7 @@ if ($action === 'save_fixed_cost') {
     }
     
     if ($id > 0) {
-        // Update
+        // Update - Get old values first
         $oldCost = $conn->query("SELECT * FROM fixed_costs WHERE id = $id")->fetch_assoc();
         
         $stmt = $conn->prepare("UPDATE fixed_costs SET 
@@ -69,8 +69,33 @@ if ($action === 'save_fixed_cost') {
                          $startDate, $endDate, $status, $id);
         
         if ($stmt->execute()) {
+            // Get new values after update
+            $newCost = $conn->query("SELECT * FROM fixed_costs WHERE id = $id")->fetch_assoc();
+            
+            // Prepare clean old and new values for audit
+            $oldValues = [
+                'cost_name' => $oldCost['cost_name'],
+                'category' => $oldCost['category'],
+                'monthly_amount' => $oldCost['monthly_amount'],
+                'description' => $oldCost['description'],
+                'start_date' => $oldCost['start_date'],
+                'end_date' => $oldCost['end_date'],
+                'status' => $oldCost['status']
+            ];
+            
+            $newValues = [
+                'cost_name' => $newCost['cost_name'],
+                'category' => $newCost['category'],
+                'monthly_amount' => $newCost['monthly_amount'],
+                'description' => $newCost['description'],
+                'start_date' => $newCost['start_date'],
+                'end_date' => $newCost['end_date'],
+                'status' => $newCost['status']
+            ];
+            
             logAudit('FIXED_COST_UPDATED', 'finance', "Updated fixed cost: $costName", 
-                    'fixed_costs', $id, $oldCost, $_POST);
+                    'fixed_costs', $id, $oldValues, $newValues);
+            
             respond(true, 'Fixed cost updated successfully');
         } else {
             respond(false, 'Failed to update fixed cost', null, 500);
@@ -88,8 +113,24 @@ if ($action === 'save_fixed_cost') {
         
         if ($stmt->execute()) {
             $costId = $conn->insert_id;
+            
+            // Get the created record
+            $newCost = $conn->query("SELECT * FROM fixed_costs WHERE id = $costId")->fetch_assoc();
+            
+            // Prepare clean new values for audit
+            $newValues = [
+                'cost_name' => $newCost['cost_name'],
+                'category' => $newCost['category'],
+                'monthly_amount' => $newCost['monthly_amount'],
+                'description' => $newCost['description'],
+                'start_date' => $newCost['start_date'],
+                'end_date' => $newCost['end_date'],
+                'status' => $newCost['status']
+            ];
+            
             logAudit('FIXED_COST_CREATED', 'finance', "Created fixed cost: $costName", 
-                    'fixed_costs', $costId, null, $_POST);
+                    'fixed_costs', $costId, null, $newValues);
+            
             respond(true, 'Fixed cost added successfully', ['cost_id' => $costId]);
         } else {
             respond(false, 'Failed to add fixed cost', null, 500);
@@ -108,12 +149,23 @@ if ($action === 'delete_fixed_cost') {
         respond(false, 'Fixed cost not found', null, 404);
     }
     
+    // Prepare old values for audit
+    $oldValues = [
+        'cost_name' => $cost['cost_name'],
+        'category' => $cost['category'],
+        'monthly_amount' => $cost['monthly_amount'],
+        'description' => $cost['description'],
+        'start_date' => $cost['start_date'],
+        'end_date' => $cost['end_date'],
+        'status' => $cost['status']
+    ];
+    
     $stmt = $conn->prepare("DELETE FROM fixed_costs WHERE id=?");
     $stmt->bind_param("i", $id);
     
     if ($stmt->execute()) {
         logAudit('FIXED_COST_DELETED', 'finance', "Deleted fixed cost: " . $cost['cost_name'], 
-                'fixed_costs', $id, $cost, null);
+                'fixed_costs', $id, $oldValues, null);
         respond(true, 'Fixed cost deleted successfully');
     } else {
         respond(false, 'Failed to delete fixed cost', null, 500);
@@ -175,7 +227,14 @@ if ($action === 'save_snapshot') {
     }
     
     if ($stmt->execute()) {
-        logAudit('BREAKEVEN_SNAPSHOT', 'finance', "Saved break-even snapshot for " . date('M Y', strtotime($month)));
+        logAudit('BREAKEVEN_SNAPSHOT', 'finance', "Saved break-even snapshot for " . date('M Y', strtotime($month)), 
+                'breakeven_snapshots', null, null, [
+                    'period_month' => $data['period_month'],
+                    'total_revenue' => $data['total_revenue'],
+                    'breakeven_revenue' => $data['breakeven_revenue'],
+                    'actual_profit' => $data['actual_profit'],
+                    'breakeven_achieved' => $data['breakeven_achieved']
+                ]);
         respond(true, 'Snapshot saved successfully', $data);
     } else {
         respond(false, 'Failed to save snapshot', null, 500);
