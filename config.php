@@ -452,17 +452,28 @@ function getTodaySales() {
 }
 
 /**
- * Check if user has permission
+ * CHECK USER PERMISSION - SINGLE DECLARATION
  */
-function hasPermission($permission) {
+function hasPermission($permissionCode) {
+    global $conn;
+    
     if (!isset($_SESSION['user_id'])) return false;
+    
+    // Owners have all permissions
     if ($_SESSION['role'] === 'owner') return true;
     
-    $userInfo = getUserInfo();
-    if (!$userInfo) return false;
+    $userId = (int)$_SESSION['user_id'];
+    $permissionCode = sanitize($permissionCode);
     
-    $permissions = json_decode($userInfo['permissions'], true);
-    return in_array('all', $permissions) || in_array($permission, $permissions);
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM user_permissions up 
+                           JOIN permissions p ON up.permission_id = p.id 
+                           WHERE up.user_id = ? AND p.code = ?");
+    $stmt->bind_param("is", $userId, $permissionCode);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    
+    return $result['count'] > 0;
 }
 
 /**
@@ -530,11 +541,9 @@ if (rand(1, 100) === 1) {
 }
 
 // ==================== WHATSAPP HELPER FUNCTIONS ====================
-// Add these functions to the bottom of config.php
 
 /**
  * Send WhatsApp receipt after sale
- * Call this function after successful sale completion
  */
 function sendWhatsAppReceiptForSale($saleId, $customerPhone = null) {
     global $conn;
@@ -584,7 +593,7 @@ function sendWhatsAppReceiptForSale($saleId, $customerPhone = null) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-    curl_setopt($ch, CURLOPT_TIMEOUT_MS, 100); // Very short timeout for async
+    curl_setopt($ch, CURLOPT_TIMEOUT_MS, 100);
     curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
     curl_exec($ch);
     curl_close($ch);
@@ -594,7 +603,6 @@ function sendWhatsAppReceiptForSale($saleId, $customerPhone = null) {
 
 /**
  * Automatic low stock check (call via cron job)
- * Add to cron: 0 9,15 * * * php /path/to/check_low_stock.php
  */
 function autoCheckLowStock() {
     global $conn;
@@ -649,7 +657,6 @@ function autoCheckLowStock() {
 
 /**
  * Automatic daily summary (call via cron job)
- * Add to cron: 0 18 * * * php /path/to/send_daily_summary.php
  */
 function autoSendDailySummary() {
     global $conn;
@@ -676,30 +683,6 @@ function autoSendDailySummary() {
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
     curl_exec($ch);
     curl_close($ch);
-}
-/**
- * CHECK USER PERMISSION
- */
-function hasPermission($permissionCode) {
-    global $conn;
-    
-    if (!isset($_SESSION['user_id'])) return false;
-    
-    // Owners have all permissions
-    if ($_SESSION['role'] === 'owner') return true;
-    
-    $userId = (int)$_SESSION['user_id'];
-    $permissionCode = sanitize($permissionCode);
-    
-    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM user_permissions up 
-                           JOIN permissions p ON up.permission_id = p.id 
-                           WHERE up.user_id = ? AND p.code = ?");
-    $stmt->bind_param("is", $userId, $permissionCode);
-    $stmt->execute();
-    $result = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-    
-    return $result['count'] > 0;
 }
 
 /**
