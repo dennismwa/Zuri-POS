@@ -39,9 +39,49 @@ include 'header.php';
     background: #f9fafb;
 }
 
+.value-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+}
+
+.value-row:nth-child(even) {
+    background: #f9fafb;
+}
+
+.value-label {
+    font-weight: 600;
+    color: #374151;
+    text-transform: capitalize;
+}
+
+.value-content {
+    color: #6b7280;
+    word-break: break-word;
+}
+
+.old-value {
+    color: #dc2626;
+    text-decoration: line-through;
+}
+
+.new-value {
+    color: #16a34a;
+    font-weight: 600;
+}
+
 @media (max-width: 768px) {
     .audit-card {
         padding: 1rem;
+    }
+    
+    .value-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
     }
 }
 </style>
@@ -163,7 +203,7 @@ include 'header.php';
 
 <!-- Log Details Modal -->
 <div id="logDetailsModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4" style="backdrop-filter: blur(4px);">
-    <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
         <div class="sticky top-0 p-6 rounded-t-2xl text-white z-10" style="background: linear-gradient(135deg, <?php echo $settings['primary_color']; ?> 0%, <?php echo $settings['primary_color']; ?>dd 100%)">
             <div class="flex justify-between items-center">
                 <h3 class="text-xl font-bold">Log Details</h3>
@@ -173,7 +213,11 @@ include 'header.php';
             </div>
         </div>
         
-        <div id="logDetailsContent" class="p-6"></div>
+        <div id="logDetailsContent" class="p-6">
+            <div class="flex items-center justify-center py-12">
+                <i class="fas fa-spinner fa-spin text-4xl" style="color: <?php echo $settings['primary_color']; ?>"></i>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -181,6 +225,31 @@ include 'header.php';
 const primaryColor = '<?php echo $settings['primary_color']; ?>';
 let currentPage = 1;
 let totalPages = 1;
+let allLogs = {};
+
+// Fields to exclude from display (meta fields)
+const excludedFields = ['action', 'id', 'created_at', 'updated_at', 'created_by', 'updated_by'];
+
+// Friendly field names
+const fieldLabels = {
+    cost_name: 'Cost Name',
+    category: 'Category',
+    monthly_amount: 'Monthly Amount',
+    start_date: 'Start Date',
+    end_date: 'End Date',
+    description: 'Description',
+    status: 'Status',
+    name: 'Name',
+    email: 'Email',
+    phone: 'Phone',
+    role: 'Role',
+    selling_price: 'Selling Price',
+    cost_price: 'Cost Price',
+    stock_quantity: 'Stock Quantity',
+    reorder_level: 'Reorder Level',
+    barcode: 'Barcode',
+    sku: 'SKU'
+};
 
 document.addEventListener('DOMContentLoaded', function() {
     loadActionTypes();
@@ -260,6 +329,11 @@ async function loadLogs() {
         const data = await response.json();
         
         if (data.success) {
+            allLogs = {};
+            data.data.logs.forEach(log => {
+                allLogs[log.id] = log;
+            });
+            
             renderLogs(data.data.logs);
             updateStats(data.data);
             updatePagination(data.data);
@@ -299,9 +373,9 @@ function renderLogs(logs) {
         const hasChanges = log.old_values || log.new_values;
         
         return `
-            <div class="log-item p-4 mb-3 rounded-lg bg-white border-2 border-gray-100 cursor-pointer"
+            <div class="log-item p-4 mb-3 rounded-lg bg-white border-2 border-gray-100 ${hasChanges ? 'cursor-pointer' : ''}"
                  style="border-left-color: ${color}"
-                 onclick="${hasChanges ? `viewLogDetails(${log.id})` : ''}">
+                 ${hasChanges ? `onclick="viewLogDetails(${log.id})"` : ''}>
                 <div class="flex items-start justify-between gap-4">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-2 flex-wrap">
@@ -338,7 +412,7 @@ function renderLogs(logs) {
                     </div>
                     
                     ${hasChanges ? `
-                    <button class="px-3 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                    <button class="px-3 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50 rounded-lg transition flex-shrink-0">
                         <i class="fas fa-eye mr-1"></i>Details
                     </button>
                     ` : ''}
@@ -351,18 +425,15 @@ function renderLogs(logs) {
 function updateStats(data) {
     document.getElementById('totalLogs').textContent = data.total.toLocaleString();
     
-    // Calculate today's logs
     const today = new Date().toDateString();
     const todayCount = data.logs.filter(log => 
         new Date(log.created_at).toDateString() === today
     ).length;
     document.getElementById('todayLogs').textContent = todayCount;
     
-    // Count unique users
     const uniqueUsers = new Set(data.logs.map(log => log.user_id).filter(id => id));
     document.getElementById('activeUsers').textContent = uniqueUsers.size;
     
-    // Count categories
     const categories = new Set(data.logs.map(log => log.action_category));
     document.getElementById('categoryCount').textContent = categories.size;
 }
@@ -427,31 +498,65 @@ function goToPage(page) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-async function viewLogDetails(logId) {
+function viewLogDetails(logId) {
+    const log = allLogs[logId];
+    
+    if (!log) {
+        showToast('Log not found', 'error');
+        return;
+    }
+    
     document.getElementById('logDetailsModal').classList.remove('hidden');
     document.getElementById('logDetailsModal').classList.add('flex');
     
-    // Find the log from current data
-    const params = new URLSearchParams({
-        action: 'get_logs',
-        date_from: document.getElementById('dateFrom').value,
-        date_to: document.getElementById('dateTo').value,
-        page: currentPage
-    });
+    renderLogDetails(log);
+}
+
+function cleanAndParseValues(values) {
+    if (!values) return null;
     
+    // Handle string JSON
+    let parsed;
     try {
-        const response = await fetch(`/api/audit-logs.php?${params}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            const log = data.data.logs.find(l => l.id === logId);
-            if (log) {
-                renderLogDetails(log);
-            }
-        }
-    } catch (error) {
-        console.error('Error loading log details:', error);
+        parsed = typeof values === 'string' ? JSON.parse(values) : values;
+    } catch (e) {
+        console.error('Failed to parse values:', e);
+        return null;
     }
+    
+    // Remove excluded fields and empty values
+    const cleaned = {};
+    for (let key in parsed) {
+        const value = parsed[key];
+        
+        // Skip excluded fields
+        if (excludedFields.includes(key)) continue;
+        
+        // Skip empty strings and null, but keep 0 and false
+        if (value === '' || value === null || value === undefined) continue;
+        
+        cleaned[key] = value;
+    }
+    
+    return Object.keys(cleaned).length > 0 ? cleaned : null;
+}
+
+function formatValue(value) {
+    if (value === null || value === undefined || value === '') {
+        return '<em class="text-gray-400">Not set</em>';
+    }
+    
+    // Format dates
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) {
+        return new Date(value).toLocaleDateString();
+    }
+    
+    // Format numbers with currency if it's a price/amount
+    if (typeof value === 'number' || !isNaN(value)) {
+        return value.toLocaleString();
+    }
+    
+    return escapeHtml(value);
 }
 
 function renderLogDetails(log) {
@@ -462,7 +567,8 @@ function renderLogDetails(log) {
         inventory: '#3b82f6',
         reports: '#f59e0b',
         admin: '#ef4444',
-        finance: '#8b5cf6'
+        finance: '#8b5cf6',
+        auth: '#6366f1'
     };
     
     const color = categoryColors[log.action_category] || primaryColor;
@@ -517,26 +623,40 @@ function renderLogDetails(log) {
         `;
     }
     
-    if (log.old_values || log.new_values) {
-        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+    // Clean and parse values
+    const oldValues = cleanAndParseValues(log.old_values);
+    const newValues = cleanAndParseValues(log.new_values);
+    
+    if (oldValues || newValues) {
+        html += `<div class="space-y-4">`;
+        html += `<h4 class="font-bold text-gray-900 text-lg">Changes Made</h4>`;
         
-        if (log.old_values) {
-            html += `
-                <div class="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
-                    <h4 class="font-bold text-red-900 mb-3">Previous Values</h4>
-                    <pre class="text-xs text-red-800 overflow-x-auto">${JSON.stringify(log.old_values, null, 2)}</pre>
-                </div>
-            `;
-        }
+        // Get all unique keys from both old and new values
+        const allKeys = new Set([
+            ...Object.keys(oldValues || {}),
+            ...Object.keys(newValues || {})
+        ]);
         
-        if (log.new_values) {
-            html += `
-                <div class="p-4 bg-green-50 border-2 border-green-200 rounded-lg">
-                    <h4 class="font-bold text-green-900 mb-3">New Values</h4>
-                    <pre class="text-xs text-green-800 overflow-x-auto">${JSON.stringify(log.new_values, null, 2)}</pre>
-                </div>
-            `;
-        }
+        allKeys.forEach(key => {
+            const oldVal = oldValues?.[key];
+            const newVal = newValues?.[key];
+            const label = fieldLabels[key] || key.replace(/_/g, ' ');
+            
+            // Only show if there's actually a change
+            if (oldVal !== newVal) {
+                html += `
+                    <div class="value-row">
+                        <div class="value-label">
+                            <i class="fas fa-tag mr-2 text-gray-400"></i>${label}
+                        </div>
+                        <div class="value-content">
+                            ${oldVal !== undefined ? `<div class="old-value mb-2">${formatValue(oldVal)}</div>` : ''}
+                            ${newVal !== undefined ? `<div class="new-value">→ ${formatValue(newVal)}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        });
         
         html += `</div>`;
     }
@@ -569,6 +689,7 @@ function exportLogs() {
 }
 
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
@@ -587,6 +708,12 @@ function showToast(message, type) {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeLogDetails();
+    }
+});
 </script>
 
 <?php include 'footer.php'; ?>
